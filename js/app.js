@@ -316,3 +316,7 @@ $("uso-data").value = hojeIso();
 $("uso-esfera").replaceChildren(...ESFERAS.map((esfera) => el("option", { value: esfera }, NOMES[esfera])));
 iniciarAjustes();
 render();
+// Permite instalar o app e usá-lo sem internet (exige HTTPS, que o GitHub Pages já tem).
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
