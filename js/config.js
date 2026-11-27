@@ -16,3 +16,5 @@ export const META_RENDA_PASSIVA_PADRAO = 0;
 export const LIMITE_ORCAMENTO_DESPESAS = DIVISAO_DA_BASE.despesas;
 // As seis esferas do app (ids usados nos registros e nos cálculos).
 export const ESFERAS = ["dizimo", "lazer", "despesas", "indep", "reserva", "curso"];
+// Saldo de partida de cada esfera (centavos). Os valores reais ficam só no app.
+export const SALDOS_INICIAIS_PADRAO = Object.fromEntries(ESFERAS.map((e) => [e, 0]));

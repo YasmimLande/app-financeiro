@@ -269,16 +269,42 @@ $("arquivo-backup").addEventListener("change", async (evento) => {
     Object.assign(estado, novo);
     persistir();
     iniciarAjustes();
+      for (const esfera of ESFERAS) {
+    $(`saldo-inicial-${esfera}`).value = estado.config.saldosIniciais[esfera] / 100;
+  }
   } catch (erro) {
     mostrarAviso(erro.message);
   } finally {
     evento.target.value = "";
   }
 });
+function montarSaldosIniciais() {
+  $("saldos-iniciais").replaceChildren(
+    ...ESFERAS.map((esfera) => {
+      const campo = el("input", {
+        id: `saldo-inicial-${esfera}`,
+        type: "number",
+        inputmode: "decimal",
+        step: "0.01",
+      });
+      campo.addEventListener("change", () => {
+        const valor = Number(campo.value);
+        if (!Number.isFinite(valor)) return;
+        estado.config.saldosIniciais[esfera] = reaisParaCentavos(valor);
+        persistir();
+      });
+      return el("div", {}, el("label", { for: campo.id }, NOMES[esfera]), campo);
+    }),
+  );
+}
 
 // ---------- Início ----------
 
-function iniciarAjustes() {
+function
+montarSaldosIniciais();
+iniciarAjustes();
+render();
+iniciarAjustes() {
   $("ajuste-dizimo").value = estado.config.dizimoPercentual;
   $("ajuste-meta-reserva").value = estado.config.metaReserva / 100;
   $("ajuste-meta-renda").value = estado.config.metaRendaPassiva / 100;

@@ -2,6 +2,7 @@ import {
   DIZIMO_PERCENTUAL_PADRAO,
   META_RESERVA_PADRAO,
   META_RENDA_PASSIVA_PADRAO,
+  SALDOS_INICIAIS_PADRAO,
 } from "./config.js";
 
 const CHAVE = "app-financeiro:v1";
@@ -11,9 +12,9 @@ export function estadoInicial() {
     entradas: [], // { id, data, valor, descricao }
     usos: [], // { id, data, valor, esfera, descricao }
     config: {
-      dizimoPercentual: DIZIMO_PERCENTUAL_PADRAO,
-      metaReserva: META_RESERVA_PADRAO,
+      dizimoPercentual: DIZIMO_PERCENTUAL_PADRAO, 
       metaRendaPassiva: META_RENDA_PASSIVA_PADRAO,
+      saldosIniciais: { ...SALDOS_INICIAIS_PADRAO },
     },
   };
 }
@@ -61,6 +62,10 @@ export function importarJson(texto) {
   if (!registrosValidos) {
     throw new Error("O backup tem registros com valor ou data inválidos.");
   }
+    const saldos = Object.values(dados.config?.saldosIniciais ?? {});
+  if (!saldos.every(Number.isInteger)) {
+    throw new Error("O backup tem saldos iniciais inválidos.");
+  }
   return mesclarComPadrao(dados);
 }
 
@@ -69,6 +74,13 @@ function mesclarComPadrao(dados) {
   return {
     entradas: dados.entradas ?? base.entradas,
     usos: dados.usos ?? base.usos,
-    config: { ...base.config, ...dados.config },
+    config: {
+      ...base.config,
+      ...dados.config,
+      saldosIniciais: {
+        ...base.config.saldosIniciais,
+        ...dados.config?.saldosIniciais,
+      },
+    },
   };
 }

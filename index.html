@@ -88,6 +88,14 @@
             <label for="ajuste-meta-renda">Meta da renda passiva (R$)</label>
             <input id="ajuste-meta-renda" type="number" inputmode="decimal" min="0" step="0.01">
           </div>
+          <div 
+          class="inteira">
+            <h3>Saldos iniciais (R$)</h3>
+            <p class="suave">O que cada esfera já tem hoje. Não conta como entrada, então não desconta dízimo.</p>
+          </div>
+          <div 
+          id="saldos-iniciais" class="inteira grade">
+          </div>
           <button id="botao-exportar" class="inteira" type="button">Baixar backup</button>
           <div class="inteira">
             <label for="arquivo-backup">Restaurar de um backup</label>

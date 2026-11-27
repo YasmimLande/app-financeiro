@@ -98,7 +98,8 @@ export function calcularResumo(estado, mesSelecionado, mesAtual) {
     esferas[esfera] = {
       recebidoNoMes: recebidoNoMes[esfera],
       usadoNoMes: usadoNoMes[esfera],
-      saldo: recebidoTotal[esfera] - usadoTotal[esfera],
+      saldo:
+        (config.saldosIniciais?.[esfera] ?? 0) + recebidoTotal[esfera] - usadoTotal[esfera],
     };
   }
   esferas.despesas.saldo -= bonusAcumulado;

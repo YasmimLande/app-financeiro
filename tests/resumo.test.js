@@ -73,3 +73,25 @@ test("dízimo acumulado por entrada, em ordem de data", () => {
     2: { dizimo: 5_000, acumulado: 15_000 },
   });
 });
+test("saldo inicial entra no saldo, mas não conta como recebido", () => {
+  const estado = {
+    config: { dizimoPercentual: 10, saldosIniciais: { reserva: 50_000 } },
+    entradas: [],
+    usos: [],
+  };
+  const r = calcularResumo(estado, "2026-11", "2026-11");
+  assert.equal(r.esferas.reserva.saldo, 50_000);
+  assert.equal(r.esferas.reserva.recebidoNoMes, 0);
+  assert.equal(r.esferas.lazer.saldo, 0);
+  assert.equal(r.dizimoAcumulado, 0);
+});
+
+test("saldo inicial soma com entradas e usos", () => {
+  const estado = {
+    config: { dizimoPercentual: 10, saldosIniciais: { reserva: 50_000 } },
+    entradas: [{ id: 1, data: "2026-11-05", valor: 100_000 }],
+    usos: [{ id: 2, data: "2026-11-10", valor: 5_000, esfera: "reserva" }],
+  };
+  const r = calcularResumo(estado, "2026-11", "2026-11");
+  assert.equal(r.esferas.reserva.saldo, 50_000 + 18_000 - 5_000);
+});
