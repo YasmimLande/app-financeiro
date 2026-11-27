@@ -1,5 +1,6 @@
 import { DIVISAO_DA_BASE, ESFERAS, LIMITE_ORCAMENTO_DESPESAS } from "./config.js";
 import { mesDe } from "./formato.js";
+import { pagamentosComoUsos, resumirDividas } from "./dividas.js";
 
 // Divide uma entrada: separa o dízimo e distribui a base pelas esferas.
 // A esfera "despesas" recebe o que sobra, para a soma fechar sempre exata.
@@ -57,7 +58,8 @@ export function dizimoPorEntrada(entradas, dizimoPercentual) {
 // Tudo que a tela precisa para o mês selecionado.
 // mesSelecionado e mesAtual no formato "2026-11".
 export function calcularResumo(estado, mesSelecionado, mesAtual) {
-  const { entradas, usos, config } = estado;
+  const { entradas, config } = estado;
+  const usos = [...estado.usos, ...pagamentosComoUsos(estado.pagamentos)];
   const meses = {}; // por mês: base, despesasAlocadas, despesasUsadas
   const doMes = (mes) =>
     (meses[mes] ??= { base: 0, despesasAlocadas: 0, despesasUsadas: 0 });
@@ -115,6 +117,7 @@ export function calcularResumo(estado, mesSelecionado, mesAtual) {
     esferas,
     dizimoAcumulado: recebidoTotal.dizimo,
     bonusAcumulado,
+    dividas: resumirDividas(estado, mesSelecionado),
     mes: {
       base: doMesSelecionado.base,
       despesasUsadas: doMesSelecionado.despesasUsadas,

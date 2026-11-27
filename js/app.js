@@ -9,6 +9,8 @@ import {
   mesDe,
   hojeIso,
 } from "./formato.js";
+import { $, el } from "./dom.js";
+import { criarTelaDividas } from "./ui-dividas.js";
 
 const NOMES = {
   dizimo: "Dízimo",
@@ -30,18 +32,6 @@ const estado = carregar();
 const mesAtual = hojeIso().slice(0, 7);
 let mesSelecionado = mesAtual;
 
-const $ = (id) => document.getElementById(id);
-
-// Cria um elemento HTML. Textos entram como texto, nunca como HTML.
-function el(tag, atributos = {}, ...filhos) {
-  const no = document.createElement(tag);
-  for (const [chave, valor] of Object.entries(atributos)) {
-    no.setAttribute(chave, valor);
-  }
-  no.append(...filhos);
-  return no;
-}
-
 function mostrarAviso(texto) {
   $("aviso").textContent = texto;
   $("aviso").hidden = !texto;
@@ -59,6 +49,7 @@ function render() {
   renderIndicador(resumo);
   renderEsferas(resumo);
   renderHistorico();
+  telaDividas.render();
 }
 
 function marca(lado, posicao, rotulo) {
@@ -104,7 +95,7 @@ function numero(rotulo, centavos, negativo = false) {
   return el("div", {}, rotulo, el("b", { class: negativo ? "negativo" : "" }, formatarMoeda(centavos)));
 }
 
-function renderEsferas({ esferas }) {
+function renderEsferas({ esferas, dividas }) {
   const metas = {
     reserva: estado.config.metaReserva,
     indep: estado.config.metaRendaPassiva,
@@ -150,7 +141,19 @@ function renderEsferas({ esferas }) {
     return cartao;
   });
 
-  $("esferas").replaceChildren(...cartoes);
+  const cartaoDividas = el(
+    "div",
+    { class: "esfera" },
+    el("h3", {}, el("span", {}, "Dívidas"), el("span", { class: "etiqueta" }, "detalhes na aba Dívidas")),
+    el(
+      "div",
+      { class: "numeros" },
+      numero("Saldo devedor", dividas.saldoTotal),
+      numero("Pago no mês", dividas.pagoNoMes),
+      numero("Pago no total", dividas.pagoTotal),
+    ),
+  );
+  $("esferas").replaceChildren(...cartoes, cartaoDividas);
 }
 
 function renderHistorico() {
@@ -253,31 +256,6 @@ ligarAjuste("ajuste-dizimo", (v) => { estado.config.dizimoPercentual = Math.min(
 ligarAjuste("ajuste-meta-reserva", (v) => { estado.config.metaReserva = reaisParaCentavos(v); });
 ligarAjuste("ajuste-meta-renda", (v) => { estado.config.metaRendaPassiva = reaisParaCentavos(v); });
 
-$("botao-exportar").addEventListener("click", () => {
-  const arquivo = new Blob([exportarJson(estado)], { type: "application/json" });
-  const link = el("a", { href: URL.createObjectURL(arquivo), download: `backup-financeiro-${hojeIso()}.json` });
-  link.click();
-  URL.revokeObjectURL(link.href);
-});
-
-$("arquivo-backup").addEventListener("change", async (evento) => {
-  const arquivo = evento.target.files[0];
-  if (!arquivo) return;
-  try {
-    const novo = importarJson(await arquivo.text());
-    if (!confirm("Isso substitui todos os dados atuais pelos do backup. Continuar?")) return;
-    Object.assign(estado, novo);
-    persistir();
-    iniciarAjustes();
-      for (const esfera of ESFERAS) {
-    $(`saldo-inicial-${esfera}`).value = estado.config.saldosIniciais[esfera] / 100;
-  }
-  } catch (erro) {
-    mostrarAviso(erro.message);
-  } finally {
-    evento.target.value = "";
-  }
-});
 function montarSaldosIniciais() {
   $("saldos-iniciais").replaceChildren(
     ...ESFERAS.map((esfera) => {
@@ -298,24 +276,70 @@ function montarSaldosIniciais() {
   );
 }
 
-// ---------- Início ----------
-
-function
-montarSaldosIniciais();
-iniciarAjustes();
-render();
-iniciarAjustes() {
+// Preenche os campos dos Ajustes com o que está salvo.
+function iniciarAjustes() {
   $("ajuste-dizimo").value = estado.config.dizimoPercentual;
   $("ajuste-meta-reserva").value = estado.config.metaReserva / 100;
   $("ajuste-meta-renda").value = estado.config.metaRendaPassiva / 100;
+  for (const esfera of ESFERAS) {
+    $(`saldo-inicial-${esfera}`).value = estado.config.saldosIniciais[esfera] / 100;
+  }
 }
+
+$("botao-exportar").addEventListener("click", () => {
+  const arquivo = new Blob([exportarJson(estado)], { type: "application/json" });
+  const link = el("a", { href: URL.createObjectURL(arquivo), download: `backup-financeiro-${hojeIso()}.json` });
+  link.click();
+  URL.revokeObjectURL(link.href);
+});
+
+$("arquivo-backup").addEventListener("change", async (evento) => {
+  const arquivo = evento.target.files[0];
+  if (!arquivo) return;
+  try {
+    const novo = importarJson(await arquivo.text());
+    if (!confirm("Isso substitui todos os dados atuais pelos do backup. Continuar?")) return;
+    Object.assign(estado, novo);
+    iniciarAjustes();
+    telaDividas.carregarCampos();
+    persistir();
+  } catch (erro) {
+    mostrarAviso(erro.message);
+  } finally {
+    evento.target.value = "";
+  }
+});
+
+// ---------- Início ----------
+
+const telaDividas = criarTelaDividas({
+  estado,
+  mesAtual,
+  persistir,
+  mostrarAviso,
+  nomesEsferas: NOMES,
+});
+
+function mostrarAba(nome) {
+  for (const botao of document.querySelectorAll("[data-aba]")) {
+    const ativa = botao.dataset.aba === nome;
+    botao.setAttribute("aria-selected", String(ativa));
+    $(`aba-${botao.dataset.aba}`).hidden = !ativa;
+  }
+}
+document.querySelectorAll("[data-aba]").forEach((botao) => {
+  botao.addEventListener("click", () => mostrarAba(botao.dataset.aba));
+});
 
 $("mes").value = mesAtual;
 $("entrada-data").value = hojeIso();
 $("uso-data").value = hojeIso();
 $("uso-esfera").replaceChildren(...ESFERAS.map((esfera) => el("option", { value: esfera }, NOMES[esfera])));
+montarSaldosIniciais();
 iniciarAjustes();
+telaDividas.carregarCampos();
 render();
+
 // Permite instalar o app e usá-lo sem internet (exige HTTPS, que o GitHub Pages já tem).
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");

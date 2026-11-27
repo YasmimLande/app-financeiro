@@ -16,98 +16,188 @@
     <p class="suave">Registre cada entrada e cada uso. O app separa o dízimo e distribui o restante pelas esferas.</p>
     <p id="aviso" class="aviso" role="alert" hidden></p>
 
-    <section>
-      <label for="mes">Mês</label>
-      <input id="mes" type="month">
-    </section>
+    <nav class="abas" aria-label="Seções do app">
+      <button type="button" data-aba="resumo" aria-selected="true">Resumo</button>
+      <button type="button" data-aba="dividas" aria-selected="false">Dívidas</button>
+      <button type="button" data-aba="planejamento" aria-selected="false">Planejamento</button>
+    </nav>
 
-    <section>
-      <h2>Registrar entrada</h2>
-      <form id="form-entrada" class="grade">
-        <div>
-          <label for="entrada-data">Data</label>
-          <input id="entrada-data" type="date" required>
-        </div>
-        <div>
-          <label for="entrada-valor">Valor (R$)</label>
-          <input id="entrada-valor" type="number" inputmode="decimal" min="0.01" step="0.01" required>
-        </div>
-        <div class="inteira">
-          <label for="entrada-descricao">Descrição</label>
-          <input id="entrada-descricao" type="text" placeholder="Ex.: bolsa, estágio">
-        </div>
-        <button class="inteira" type="submit">Registrar entrada</button>
-      </form>
-    </section>
+    <div id="aba-resumo">
+      <section>
+        <label for="mes">Mês</label>
+        <input id="mes" type="month">
+      </section>
 
-    <section>
-      <h2>Registrar uso</h2>
-      <form id="form-uso" class="grade">
-        <div>
-          <label for="uso-data">Data</label>
-          <input id="uso-data" type="date" required>
-        </div>
-        <div>
-          <label for="uso-valor">Valor (R$)</label>
-          <input id="uso-valor" type="number" inputmode="decimal" min="0.01" step="0.01" required>
-        </div>
-        <div class="inteira">
-          <label for="uso-esfera">Esfera</label>
-          <select id="uso-esfera"></select>
-        </div>
-        <div class="inteira">
-          <label for="uso-descricao">Descrição</label>
-          <input id="uso-descricao" type="text" placeholder="Ex.: mercado, livro de farmacologia">
-        </div>
-        <button class="inteira" type="submit">Registrar uso</button>
-      </form>
-    </section>
-
-    <section id="indicador" aria-live="polite"></section>
-
-    <section>
-      <h2>Esferas</h2>
-      <div id="esferas"></div>
-    </section>
-
-    <section>
-      <h2>Registros do mês</h2>
-      <div id="historico"></div>
-    </section>
-
-    <section>
-      <details>
-        <summary>Ajustes e backup</summary>
-        <div class="grade">
+      <section>
+        <h2>Registrar entrada</h2>
+        <form id="form-entrada" class="grade">
           <div>
-            <label for="ajuste-dizimo">Dízimo (% de cada entrada)</label>
-            <input id="ajuste-dizimo" type="number" inputmode="decimal" min="0" max="100" step="0.5">
-          </div>
-          <div></div>
-          <div>
-            <label for="ajuste-meta-reserva">Meta da reserva (R$)</label>
-            <input id="ajuste-meta-reserva" type="number" inputmode="decimal" min="0" step="0.01">
+            <label for="entrada-data">Data</label>
+            <input id="entrada-data" type="date" required>
           </div>
           <div>
-            <label for="ajuste-meta-renda">Meta da renda passiva (R$)</label>
-            <input id="ajuste-meta-renda" type="number" inputmode="decimal" min="0" step="0.01">
+            <label for="entrada-valor">Valor (R$)</label>
+            <input id="entrada-valor" type="number" inputmode="decimal" min="0.01" step="0.01" required>
           </div>
-          <div 
-          class="inteira">
-            <h3>Saldos iniciais (R$)</h3>
-            <p class="suave">O que cada esfera já tem hoje. Não conta como entrada, então não desconta dízimo.</p>
-          </div>
-          <div 
-          id="saldos-iniciais" class="inteira grade">
-          </div>
-          <button id="botao-exportar" class="inteira" type="button">Baixar backup</button>
           <div class="inteira">
-            <label for="arquivo-backup">Restaurar de um backup</label>
-            <input id="arquivo-backup" type="file" accept="application/json">
+            <label for="entrada-descricao">Descrição</label>
+            <input id="entrada-descricao" type="text" placeholder="Ex.: bolsa, estágio">
+          </div>
+          <button class="inteira" type="submit">Registrar entrada</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>Registrar uso</h2>
+        <form id="form-uso" class="grade">
+          <div>
+            <label for="uso-data">Data</label>
+            <input id="uso-data" type="date" required>
+          </div>
+          <div>
+            <label for="uso-valor">Valor (R$)</label>
+            <input id="uso-valor" type="number" inputmode="decimal" min="0.01" step="0.01" required>
+          </div>
+          <div class="inteira">
+            <label for="uso-esfera">Esfera</label>
+            <select id="uso-esfera"></select>
+          </div>
+          <div class="inteira">
+            <label for="uso-descricao">Descrição</label>
+            <input id="uso-descricao" type="text" placeholder="Ex.: mercado, livro de farmacologia">
+          </div>
+          <button class="inteira" type="submit">Registrar uso</button>
+        </form>
+      </section>
+
+      <section id="indicador" aria-live="polite"></section>
+
+      <section>
+        <h2>Esferas</h2>
+        <div id="esferas"></div>
+      </section>
+
+      <section>
+        <h2>Registros do mês</h2>
+        <div id="historico"></div>
+      </section>
+
+      <section>
+        <details>
+          <summary>Ajustes e backup</summary>
+          <div class="grade">
+            <div>
+              <label for="ajuste-dizimo">Dízimo (% de cada entrada)</label>
+              <input id="ajuste-dizimo" type="number" inputmode="decimal" min="0" max="100" step="0.5">
+            </div>
+            <div></div>
+            <div>
+              <label for="ajuste-meta-reserva">Meta da reserva (R$)</label>
+              <input id="ajuste-meta-reserva" type="number" inputmode="decimal" min="0" step="0.01">
+            </div>
+            <div>
+              <label for="ajuste-meta-renda">Meta da renda passiva (R$)</label>
+              <input id="ajuste-meta-renda" type="number" inputmode="decimal" min="0" step="0.01">
+            </div>
+            <div class="inteira">
+              <h3>Saldos iniciais (R$)</h3>
+              <p class="suave">O que cada esfera já tem hoje. Não conta como entrada, então não desconta dízimo.</p>
+            </div>
+            <div id="saldos-iniciais" class="inteira grade"></div>
+            <button id="botao-exportar" class="inteira" type="button">Baixar backup</button>
+            <div class="inteira">
+              <label for="arquivo-backup">Restaurar de um backup</label>
+              <input id="arquivo-backup" type="file" accept="application/json">
+            </div>
+          </div>
+        </details>
+      </section>
+    </div>
+
+    <div id="aba-dividas" hidden>
+      <section>
+        <h2>Dívidas</h2>
+        <div id="dividas-resumo"></div>
+        <div id="dividas-lista"></div>
+      </section>
+
+      <section>
+        <h2>Cadastrar dívida</h2>
+        <form id="form-divida" class="grade">
+          <div class="inteira">
+            <label for="divida-nome">Nome</label>
+            <input id="divida-nome" type="text" placeholder="Ex.: limite da conta, fatura do cartão" required>
+          </div>
+          <div class="inteira">
+            <label for="divida-tipo">Tipo</label>
+            <select id="divida-tipo"></select>
+          </div>
+          <div>
+            <label for="divida-saldo">Saldo devedor (R$)</label>
+            <input id="divida-saldo" type="number" inputmode="decimal" min="0.01" step="0.01" required>
+          </div>
+          <div>
+            <label for="divida-juros">Juros (% ao mês)</label>
+            <input id="divida-juros" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0">
+          </div>
+          <div class="inteira">
+            <label for="divida-parcela">Parcela mínima mensal (R$), se houver</label>
+            <input id="divida-parcela" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0">
+          </div>
+          <button class="inteira" type="submit">Cadastrar dívida</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>Registrar pagamento</h2>
+        <form id="form-pagamento" class="grade">
+          <div class="inteira">
+            <label for="pag-divida">Dívida</label>
+            <select id="pag-divida"></select>
+          </div>
+          <div>
+            <label for="pag-data">Data</label>
+            <input id="pag-data" type="date" required>
+          </div>
+          <div>
+            <label for="pag-valor">Valor (R$)</label>
+            <input id="pag-valor" type="number" inputmode="decimal" min="0.01" step="0.01" required>
+          </div>
+          <div class="inteira">
+            <label for="pag-origem">De onde saiu o dinheiro</label>
+            <select id="pag-origem"></select>
+          </div>
+          <button class="inteira" type="submit">Registrar pagamento</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>Pagamentos</h2>
+        <div id="pagamentos-lista"></div>
+      </section>
+    </div>
+
+    <div id="aba-planejamento" hidden>
+      <section>
+        <h2>Planejamento de quitação</h2>
+        <div class="grade">
+          <div class="inteira">
+            <label for="plan-estrategia">Estratégia</label>
+            <select id="plan-estrategia"></select>
+          </div>
+          <div>
+            <label for="plan-orcamento">Quanto posso pagar por mês (R$)</label>
+            <input id="plan-orcamento" type="number" inputmode="decimal" min="0" step="0.01">
+          </div>
+          <div>
+            <label for="plan-aporte">Aporte único agora (R$)</label>
+            <input id="plan-aporte" type="number" inputmode="decimal" min="0" step="0.01">
           </div>
         </div>
-      </details>
-    </section>
+        <p class="suave">O aporte único é um valor de uma vez só, como um resgate de investimento. O valor mensal já inclui as parcelas mínimas.</p>
+      </section>
+      <section id="plano-resultado" aria-live="polite"></section>
+    </div>
   </main>
   <script type="module" src="js/app.js"></script>
 </body>

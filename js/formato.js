@@ -38,3 +38,17 @@ export function hojeIso() {
   const dia = String(d.getDate()).padStart(2, "0");
   return `${d.getFullYear()}-${mes}-${dia}`;
 }
+// "2026-11" + 3 -> "2027-02"
+export function somarMeses(mes, quantidade) {
+  const [ano, numero] = mes.split("-").map(Number);
+  const indice = ano * 12 + (numero - 1) + quantidade;
+  const novoAno = Math.floor(indice / 12);
+  const novoMes = (indice % 12) + 1;
+  return `${novoAno}-${String(novoMes).padStart(2, "0")}`;
+}
+
+// "2026-11" -> "nov. de 2026"
+export function formatarMes(mes) {
+  const [ano, numero] = mes.split("-").map(Number);
+  return new Date(ano, numero - 1, 1).toLocaleDateString("pt-BR", { month: "short", year: "numeric" });
+}

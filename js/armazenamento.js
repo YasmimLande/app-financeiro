@@ -3,6 +3,7 @@ import {
   META_RESERVA_PADRAO,
   META_RENDA_PASSIVA_PADRAO,
   SALDOS_INICIAIS_PADRAO,
+  PLANEJAMENTO_PADRAO,
 } from "./config.js";
 
 const CHAVE = "app-financeiro:v1";
@@ -11,10 +12,14 @@ export function estadoInicial() {
   return {
     entradas: [], // { id, data, valor, descricao }
     usos: [], // { id, data, valor, esfera, descricao }
+    dividas: [], // { id, nome, tipo, saldo, valorInicial, jurosMensal, parcelaMinima }
+    pagamentos: [], // { id, dividaId, data, valor, origem }
     config: {
-      dizimoPercentual: DIZIMO_PERCENTUAL_PADRAO, 
+      dizimoPercentual: DIZIMO_PERCENTUAL_PADRAO,
+      metaReserva: META_RESERVA_PADRAO,
       metaRendaPassiva: META_RENDA_PASSIVA_PADRAO,
       saldosIniciais: { ...SALDOS_INICIAIS_PADRAO },
+      planejamento: { ...PLANEJAMENTO_PADRAO },
     },
   };
 }
@@ -66,6 +71,19 @@ export function importarJson(texto) {
   if (!saldos.every(Number.isInteger)) {
     throw new Error("O backup tem saldos iniciais inválidos.");
   }
+    const dividasValidas = (dados.dividas ?? []).every(
+    (d) =>
+      typeof d.nome === "string" &&
+      Number.isInteger(d.saldo) && d.saldo >= 0 &&
+      Number.isFinite(d.jurosMensal) && d.jurosMensal >= 0 &&
+      Number.isInteger(d.parcelaMinima) && d.parcelaMinima >= 0,
+  );
+  const pagamentosValidos = (dados.pagamentos ?? []).every(
+    (p) => Number.isInteger(p.valor) && p.valor > 0 && typeof p.data === "string",
+  );
+  if (!dividasValidas || !pagamentosValidos) {
+    throw new Error("O backup tem dívidas ou pagamentos inválidos.");
+  }
   return mesclarComPadrao(dados);
 }
 
@@ -74,13 +92,13 @@ function mesclarComPadrao(dados) {
   return {
     entradas: dados.entradas ?? base.entradas,
     usos: dados.usos ?? base.usos,
+    dividas: dados.dividas ?? base.dividas,
+    pagamentos: dados.pagamentos ?? base.pagamentos,
     config: {
       ...base.config,
       ...dados.config,
-      saldosIniciais: {
-        ...base.config.saldosIniciais,
-        ...dados.config?.saldosIniciais,
-      },
+      saldosIniciais: { ...base.config.saldosIniciais, ...dados.config?.saldosIniciais },
+      planejamento: { ...base.config.planejamento, ...dados.config?.planejamento },
     },
   };
 }

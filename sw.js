@@ -1,7 +1,8 @@
-const VERSAO = "v1";
+const VERSAO = "v2";
 const ARQUIVOS = [
   "./", "index.html", "css/style.css", "manifest.webmanifest",
   "js/app.js", "js/config.js", "js/calculos.js", "js/formato.js", "js/armazenamento.js",
+  "js/dom.js", "js/dividas.js", "js/ui-dividas.js",
   "icons/icon-192.png", "icons/icon-512.png",
 ];
 
